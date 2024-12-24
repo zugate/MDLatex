@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>KaTeX Renderer</title>
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+    <div id="content"></div>
+    <script>
+        function renderAllContent(html) {
+            const content = document.getElementById('content');
+            if (content) {
+                content.innerHTML = html;
+                renderMathContent();
+                updateHeight();
+            }
+        }
+        
+        function renderMathContent() {
+            const content = document.getElementById("content");
+            if (content) {
+                renderMathInElement(content, {
+                    delimiters: [
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function updateHeight() {
+            const content = document.getElementById('content');
+            if (content) {
+                const height = content.scrollHeight;
+                if (window.webkit?.messageHandlers?.contentHeight) {
+                    window.webkit.messageHandlers.contentHeight.postMessage(height);
+                }
+            }
+        }
+
+        // Called on DOMContentLoaded to do initial setup.
+        // The actual text is injected from Swift code.
+        document.addEventListener("DOMContentLoaded", function () {
+            updateHeight();
+        });
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+        }
+
+        /* The content div, with bottom padding only */
+        #content {
+            margin: 0;
+            padding: 0 0 16px 0;
+            line-height: 1.5;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            -webkit-text-size-adjust: none;
+        }
+
+        .katex {
+            font-size: 1.1em;
+            line-height: 1.2;
+        }
+    </style>
+</body>
+</html>
+
