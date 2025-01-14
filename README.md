@@ -20,7 +20,7 @@ A powerful Swift package for seamlessly rendering Markdown with LaTeX support. F
 Add the following to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/zugate/MDLatex.git", from: "1.0.0")
+.package(url: "https://github.com/zugate/MDLatex", from: "1.0.0")
 ```
 
 Include `MDLatex` as a dependency for your target:
@@ -31,7 +31,7 @@ Include `MDLatex` as a dependency for your target:
 
 Or add it via Xcode:
 1. Navigate to `File > Add Packages`.
-2. Enter the repository URL: `https://github.com/zugate/MDLatex.git`.
+2. Enter the repository URL: `https://github.com/kumar-shubham-zugate/MDLatex`.
 3. Choose the latest version and integrate it into your project.
 
 ---
@@ -45,24 +45,42 @@ Render Markdown with embedded LaTeX expressions:
 import MDLatex
 
 struct ContentView: View {
+    @State private var renderingComplete = false
     var body: some View {
-        MarkdownLatexView(markdownContent: """
-        # Title
-        This is some inline math: \(x^2 + y^2 = z^2\).
+        VStack {
+            if renderingComplete {
+                Text("Rendering Complete!")
+                    .font(.headline)
+                    .padding()
+            }
 
-        And a display equation:
-        \[
-        E = mc^2
-        \]
-        """)
-        .themeConfiguration(
-            backgroundColor: .white,
-            fontColor: .black,
-            fontSize: 16,
-            fontFamily: "Arial",
-            userInteractionEnabled: true
-        )
-        .animationEnabled(true, chunkRenderingDuration: 0.5)
+            MDLatex.render(
+                markdown: """
+                # Title
+                This is some inline math: \(x^2 + y^2 = z^2\).
+
+                And a display equation:
+                \[
+                E = mc^2
+                \]
+                """,
+                theme: ThemeConfiguration(
+                    backgroundColor: Color.clear,
+                    fontColor: Color.black,
+                    fontSize: 16,
+                    fontFamily: "Arial",
+                    userInteractionEnabled: true
+                ),
+                animation: AnimationConfiguration(isEnabled: true, chunkRenderingDuration: 0.4),
+                width: UIScreen.main.bounds.width - 32,
+                onComplete: { _ in
+                    /// to do on complete rendering 
+                },
+                onChunkRendered: { _, _ in
+                    /// to do on chunk rendered
+                }
+            )
+        }
     }
 }
 ```
@@ -73,14 +91,18 @@ struct ContentView: View {
 Configure the theme using the fluent API:
 
 ```swift
-MarkdownLatexView(markdownContent: "# Custom Theme")
-    .themeConfiguration(
+MDLatex.render(
+    markdown: "# Custom Theme Example",
+    theme: ThemeConfiguration(
         backgroundColor: .blue,
         fontColor: .white,
         fontSize: 20,
         fontFamily: "Helvetica",
         userInteractionEnabled: true
-    )
+    ),
+    animation: AnimationConfiguration(isEnabled: false),
+    width: UIScreen.main.bounds.width - 32
+)
 ```
 
 ---
@@ -89,27 +111,44 @@ MarkdownLatexView(markdownContent: "# Custom Theme")
 Enable chunk-based animations for rendering large content:
 
 ```swift
-MarkdownLatexView(markdownContent: """
-# Animated Content
-Chunk 1...
+MDLatex.render(
+    markdown: """
+    # Animated Content Example
+    Chunk 1...
 
-Chunk 2...
+    Chunk 2...
 
-Chunk 3...
-""")
-.animationEnabled(true, chunkRenderingDuration: 0.3)
+    Chunk 3...
+    """,
+    theme: ThemeConfiguration(
+        backgroundColor: .white,
+        fontColor: .black,
+        fontSize: 16,
+        fontFamily: "Arial"
+    ),
+    animation: AnimationConfiguration(isEnabled: true, chunkRenderingDuration: 0.3)
+    )
 ```
 
 Use `onChunkRendered` and `onComplete` for callbacks:
 
 ```swift
-MarkdownLatexView(markdownContent: "Large Document")
-    .onChunkRendered { chunk, index in
+MDLatex.render(
+    markdown: """
+    # Animated Content Example
+    Chunk 1...
+
+    Chunk 2...
+
+    Chunk 3...
+    """,
+        .onChunkRendered { chunk, index in
         print("Rendered chunk \(index): \(chunk)")
     }
     .onComplete { finalHTML in
         print("Rendering complete: \(finalHTML)")
     }
+)    
 ```
 
 ---
@@ -117,10 +156,8 @@ MarkdownLatexView(markdownContent: "Large Document")
 ### Caching Content
 Take advantage of caching in non-animated mode:
 
-```swift
-MarkdownLatexView(markdownContent: "Repeated Content")
-.renderAllContentAtOnceCached()
-```
+It by default caches the contents once rendered so you wont see a rerendering jitter
+
 
 ---
 
@@ -140,11 +177,6 @@ MarkdownLatexView(markdownContent: "Repeated Content")
 - **`MarkdownLatexView`:** The main SwiftUI view for rendering Markdown and LaTeX.
 - **`MarkdownLatexParser`:** A utility for extracting and reinjecting LaTeX expressions into HTML.
 - **`katex_template.html`:** A prebuilt HTML template for KaTeX rendering.
-
----
-
-## Example Project
-Check out the example project in the `Examples` folder for a hands-on demonstration of integrating **MDLatex** into your app.
 
 ---
 
