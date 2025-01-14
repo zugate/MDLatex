@@ -36,7 +36,7 @@ extension MarkdownLatexView {
     func renderAllContentAtOnceCached() {
         if let cachedHTML = viewModel.renderedHTMLCache[markdownContent] {
             // If we already generated final HTML for this Markdown, reuse it
-            print("Using cached HTML for non-animated flow")
+            debugPrint("Using cached HTML for non-animated flow")
             injectAllContentIntoWebView(cachedHTML)
         } else {
             // Convert from Markdown -> final HTML, store in cache, then inject
@@ -56,7 +56,7 @@ extension MarkdownLatexView {
         do {
             markdownHTML = try down.toHTML()
         } catch {
-            print("Failed to render Markdown:", error)
+            debugPrint("Failed to render Markdown:", error)
             return ""
         }
         // 3) Re-inject LaTeX into the HTML
@@ -73,11 +73,10 @@ extension MarkdownLatexView {
         
         viewModel.webViewRef.evaluateJavaScript(js) { _, error in
             if let error = error {
-                print("Error injecting HTML in one-go:", error)
+                debugPrint("Error injecting HTML in one-go:", error)
             } else {
                 self.onLoadingComplete?(html)
             }
         }
     }
 }
-
