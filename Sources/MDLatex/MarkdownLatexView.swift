@@ -3,7 +3,6 @@
 //  MDLatex
 //
 //  Created by Kumar Shubham on 23/12/24.
-//  Enhanced by <Your Name>
 //
 
 import SwiftUI
@@ -36,16 +35,14 @@ struct MarkdownLatexView: View {
             let contentController = WKUserContentController()
             let webConfiguration = WKWebViewConfiguration()
             webConfiguration.userContentController = contentController
-            
             self.webViewRef = WKWebView(frame: .zero, configuration: webConfiguration)
-            
-            // Default: no animation, black background, size=16, userInteraction=true
-//            self.animationConfig = AnimationConfiguration(isEnabled: false, chunkRenderingDuration: 0)
-//            self.themeConfig = ThemeConfiguration(
-//                backgroundColor: .black,
-//                fontSize: 16,
-//                userInteractionEnabled: true
-//            )
+        }
+        
+        deinit {
+            // Clean up resources to avoid memory leaks
+            webViewRef.stopLoading()
+            webViewRef.navigationDelegate = nil
+            webViewRef.uiDelegate = nil
         }
     }
     
